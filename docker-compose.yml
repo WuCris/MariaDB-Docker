@@ -20,7 +20,7 @@ services:
       - mariadb-master:/var/lib/mysql
 
   mariadb-slave:
-    image: mariadb:latest
+    image: mariadb:11.2
     command: --server-id=2 --log-basename=master1 --binlog-format=mixed --read-only
     environment:
       MARIADB_RANDOM_ROOT_PASSWORD: yes
