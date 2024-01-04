@@ -3,7 +3,6 @@ threads=auto
 admin_host=0.0.0.0
 admin_secure_gui=false
 
-
 [mariadb-master]
 type=server
 address=mariadb-master
