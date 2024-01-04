@@ -2,13 +2,14 @@
 threads=auto
 admin_host=0.0.0.0
 
-[server1]
+
+[mariadb-master]
 type=server
 address=mariadb-master
 port=3306
 protocol=MariaDBBackend
 
-[server2]
+[mariadb-slave]
 type=server
 address=mariadb-slave
 port=3306
@@ -23,7 +24,7 @@ password=maxscale_pw
 monitor_interval=2s
 
 
-[Splitter Service]
+[Splitter-Service]
 type=service
 router=readwritesplit
 servers=mariadb-master,mariadb-slave
@@ -32,6 +33,6 @@ password=maxscale_pw
 
 [Splitter-Listener]
 type=listener
-service=Read-Write-Service
-protocol=mariadbprotocol
+service=Splitter-Service
+protocol=MariaDBClient
 port=3306

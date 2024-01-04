@@ -11,6 +11,8 @@ services:
     build:
       context: maxscale
     hostname: mariadb-maxscale
+    ports: 
+      - 8989:8989
     depends_on:
       - mariadb-master
       - mariadb-slave
