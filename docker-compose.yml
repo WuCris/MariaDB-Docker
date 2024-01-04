@@ -1,11 +1,27 @@
 version: "3"
 
 services:
+
+  nginx-cmd:
+    image: nginx:alpine
+    hostname: nginx-cmd
+
+  mariadb-maxscale:
+    image: mariadb/maxscale:23.08
+    build:
+      context: maxscale
+    hostname: mariadb-maxscale
+    depends_on:
+      - mariadb-master
+      - mariadb-slave
+
   mariadb-master:
     image: mariadb:11.2
     command: --server_id=1 --log-bin --log-basename=master1 --binlog-format=mixed
+    build:
+      context: mariadb
     environment:
-      MARIADB_RANDOM_ROOT_PASSWORD: yes
+      MARIADB_ROOT_PASSWORD:
       MARIADB_USER: databaseuser
       MARIADB_PASSWORD: databasepassword
       MARIADB_DATABASE: databasename
@@ -22,8 +38,10 @@ services:
   mariadb-slave:
     image: mariadb:11.2
     command: --server-id=2 --log-basename=master1 --binlog-format=mixed --read-only
+    build:
+      context: mariadb
     environment:
-      MARIADB_RANDOM_ROOT_PASSWORD: yes
+      MARIADB_ROOT_PASSWORD:
       MARIADB_MASTER_HOST: mariadb-master
       MARIADB_REPLICATION_USER:
       MARIADB_REPLICATION_PASSWORD:
