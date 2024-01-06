@@ -27,6 +27,9 @@ services:
       MARIADB_DATABASE: databasename
       MARIADB_REPLICATION_USER: 
       MARIADB_REPLICATION_PASSWORD:
+    # Maximum of 1 replica permitted for master
+    deploy:
+      replicas: 1
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 10s
@@ -37,7 +40,7 @@ services:
 
   mariadb-slave:
     image: "harbor.lan:8443/library/mariadb-custom:11.2"
-    command: --server_id=2 --log-basename=master1 --binlog-format=mixed --read-only
+    command: --log-basename=master1 --binlog-format=mixed --read-only
     build:
       context: mariadb
     environment:
@@ -47,6 +50,16 @@ services:
       MARIADB_REPLICATION_PASSWORD:
       MARIADB_HEALTHCHECK_GRANTS: REPLICA MONITOR
       TASK_SLOT: "{{.Task.Slot}}"
+    deploy:
+      replicas: 3
+      placement:
+        # Max of one replica per node to prevent volume mount conflict
+        max_replicas_per_node: 1
+      update_config:
+        parallelism: 1
+        order: start-first
+        failure_action: rollback
+        delay: 10s
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--replication_io", "--replication_sql", "--replication_seconds_behind_master=1", "--replication"]
       interval: 10s
