@@ -36,7 +36,7 @@ services:
       timeout: 5s
       retries: 3
     volumes:
-      - mariadb-master:/var/lib/mysql
+      - /mnt/gluster/mariadb/mariadb-master:/var/lib/mysql
 
   mariadb-slave:
     image: "harbor.lan:8443/library/mariadb-custom:11.2"
