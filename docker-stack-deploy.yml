@@ -7,18 +7,16 @@ services:
     hostname: nginx-cmd
 
   mariadb-maxscale:
-    image: mariadb/maxscale:23.08
+    image: "harbor.lan:8443/library/maxscale-custom:rocky9"
     build:
       context: maxscale
     hostname: mariadb-maxscale
-    ports: 
-      - 8989:8989
     depends_on:
       - mariadb-master
       - mariadb-slave
 
   mariadb-master:
-    image: mariadb:11.2
+    image: "harbor.lan:8443/library/mariadb-custom:11.2"
     command: --server_id=1 --log-bin --log-basename=master1 --binlog-format=mixed
     build:
       context: mariadb
@@ -38,8 +36,8 @@ services:
       - mariadb-master:/var/lib/mysql
 
   mariadb-slave:
-    image: mariadb:11.2
-    command: --server-id=2 --log-basename=master1 --binlog-format=mixed --read-only
+    image: "harbor.lan:8443/library/mariadb-custom:11.2"
+    command: --server_id=2 --log-basename=master1 --binlog-format=mixed --read-only
     build:
       context: mariadb
     environment:
@@ -48,14 +46,14 @@ services:
       MARIADB_REPLICATION_USER:
       MARIADB_REPLICATION_PASSWORD:
       MARIADB_HEALTHCHECK_GRANTS: REPLICA MONITOR
+      TASK_SLOT: "{{.Task.Slot}}"
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--replication_io", "--replication_sql", "--replication_seconds_behind_master=1", "--replication"]
       interval: 10s
       timeout: 5s
       retries: 3
     depends_on:
-      mariadb-master:
-        condition: service_healthy
+      - mariadb-master
     volumes:
       - mariadb-slave:/var/lib/mysql
 
