@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mariadb-maxscale
+  labels:
+    app: mariadb-maxscale
+spec:
+  clusterIP: None
+  ports:
+  - port: 3306
+    name: mariadb-maxscale
+  selector:
+    app: mariadb-maxscale
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mariadb-maxscale
+  labels:
+    app: mariadb-maxscale
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mariadb-maxscale
+  template:
+    metadata:
+      labels:
+        app: mariadb-maxscale
+    spec:
+      hostname: mariadb-maxscale
+      containers:
+      - name: mariadb-maxscale
+        image: mariadb:11.2
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3306
