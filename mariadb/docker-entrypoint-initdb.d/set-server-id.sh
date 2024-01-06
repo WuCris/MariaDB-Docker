@@ -1,5 +1,7 @@
 #/bin/sh
 
+set -e
+
 if [ ! -z "${TASK_SLOT}" ]; then
     echo "Docker Swarm mode detected"
     MARIADB_SERVER_ID=$(($TASK_SLOT+1))

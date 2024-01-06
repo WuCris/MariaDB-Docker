@@ -48,6 +48,7 @@ services:
       MARIADB_REPLICATION_USER:
       MARIADB_REPLICATION_PASSWORD:
       MARIADB_HEALTHCHECK_GRANTS: REPLICA MONITOR
+      TASK_SLOT: 1
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--replication_io", "--replication_sql", "--replication_seconds_behind_master=1", "--replication"]
       interval: 10s
