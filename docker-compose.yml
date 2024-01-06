@@ -1,0 +1,64 @@
+version: "3"
+
+services:
+
+  nginx-cmd:
+    image: nginx:alpine
+    hostname: nginx-cmd
+
+  mariadb-maxscale:
+    image: mariadb/maxscale:23.08
+    build:
+      context: maxscale
+    hostname: mariadb-maxscale
+    ports: 
+      - 8989:8989
+    depends_on:
+      - mariadb-master
+      - mariadb-slave
+
+  mariadb-master:
+    image: mariadb:11.2
+    command: --server_id=1 --log-bin --log-basename=master1 --binlog-format=mixed
+    build:
+      context: mariadb
+    environment:
+      MARIADB_ROOT_PASSWORD:
+      MARIADB_USER: databaseuser
+      MARIADB_PASSWORD: databasepassword
+      MARIADB_DATABASE: databasename
+      MARIADB_REPLICATION_USER: 
+      MARIADB_REPLICATION_PASSWORD:
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    volumes:
+      - mariadb-master:/var/lib/mysql
+
+  mariadb-slave:
+    image: mariadb:11.2
+    command: --server-id=2 --log-basename=master1 --binlog-format=mixed --read-only
+    build:
+      context: mariadb
+    environment:
+      MARIADB_ROOT_PASSWORD:
+      MARIADB_MASTER_HOST: mariadb-master
+      MARIADB_REPLICATION_USER:
+      MARIADB_REPLICATION_PASSWORD:
+      MARIADB_HEALTHCHECK_GRANTS: REPLICA MONITOR
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--replication_io", "--replication_sql", "--replication_seconds_behind_master=1", "--replication"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    depends_on:
+      mariadb-master:
+        condition: service_healthy
+    volumes:
+      - mariadb-slave:/var/lib/mysql
+
+volumes:
+    mariadb-master:
+    mariadb-slave:
