@@ -97,7 +97,7 @@ spec:
         - name: MARIADB_USER
           value: databaseuser
         - name: MARIADB_DATABASE
-          value: databasepassword
+          value: databases
         - name: MARIADB_REPLICATION_USER
           value: replication_user
         args: ["--server_id=1", "--log-bin", "--log-basename=master1", "--binlog-format=mixed"]

@@ -39,7 +39,7 @@ metadata:
   labels:
     app: mariadb-slave
 spec:
-  storageClassName: gluster-hostpath
+  storageClassName: local-hostpath
   accessModes:
     - ReadWriteOnce
   resources:
@@ -55,7 +55,7 @@ metadata:
   labels:
     app: mariadb-slave
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: mariadb-slave
