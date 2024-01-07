@@ -33,7 +33,7 @@ spec:
       hostname: mariadb-maxscale
       containers:
       - name: mariadb-maxscale
-        image: mariadb:11.2
+        image: "harbor.lan:8443/library/maxscale-custom:rocky9"
         imagePullPolicy: Always
         ports:
         - containerPort: 3306
